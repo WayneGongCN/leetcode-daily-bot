@@ -17,8 +17,7 @@ const getQuestion = ({ cookie }) => {
     .then(res => {
       const questions = res.data.data && res.data.data.dailyQuestionRecords
       const todayData = questions[0] || null
-      console.log('todayData: ', todayData)
-      if (!todayData) throw new Error(res.data)
+      if (!todayData) throw new Error(JSON.stringify(res.data))
       return todayData
     })
 }
@@ -36,7 +35,7 @@ const sendWechatMsg = ({ question, hookUrl, chatid }) => {
 
   return axios.post(hookUrl, wechatMsg)
     .then(res => {
-      if (res.data && res.data.errcode !== 0) throw new Error(res.data)
+      if (res.data && res.data.errcode !== 0) throw new Error(JSON.stringify(res.data))
       return res.data
     })
 }
@@ -50,9 +49,16 @@ async function main () {
     console.error('params error', argv)
     return process.exit(1)
   } else {
-    const question = await getQuestion({ cookie })
+    const question = await getQuestion({ cookie }).catch(console.error)
+    console.log('question: ', question)
+    if (!question) return process.exit(1)
+
     await sendWechatMsg({ question, hookUrl, chatid })
-    return process.exit(0)
+      .then(console.log)
+      .catch(e => {
+        console.error(e)
+        process.exit(1)
+      })
   }
 }
 main()
