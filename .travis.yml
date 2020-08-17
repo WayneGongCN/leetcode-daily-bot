@@ -1,6 +1,6 @@
 language: node_js
-node_js: 
+node_js:
   - lts/*
 
 script:
-  - node index.js --cookie "${COOKIE}" --hookUrl ${HOOK_URL} --chatid "${CHAT_ID}"
+  - node index.js --hookUrl ${HOOK_URL} --chatid "${CHAT_ID}"
